@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+	xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.2.xsd">
+
+<!-- 메일 서버 설정 빈 -->
+<beans:bean class="org.springframework.mail.javamail.JavaMailSenderImpl"
+	id="mailSender">
+	<beans:property value="smtp.naver.com" name="host" />
+	<beans:property value="587" name="port" />
+	<beans:property name="username" value="ggangpae3" />
+	<beans:property name="password" value="wnddkd"></beans:property>
+	<beans:property value="utf-8" name="defaultEncoding" />
+	<beans:property name="javaMailProperties">
+		<beans:props>
+		<beans:prop key="mail.transport.protocol">smtp</beans:prop>
+		<beans:prop key="mail.smtp.auth">true</beans:prop>
+		<beans:prop key="mail.smtp.starttls.enable">true</beans:prop>
+		<beans:prop key="mail.debug">true</beans:prop>
+		</beans:props>
+	</beans:property>
+</beans:bean>
+
+	<!--어노테이션으로 만든 AOP 적용 -->
+	<aop:aspectj-autoproxy />
+
+
+	<!-- Interceptor 적용 -->
+	<interceptors>
+		<interceptor>
+			<mapping path="board/register" />
+			<mapping path="board/detail" />
+			<mapping path="board/update" />
+			<mapping path="board/delete" />
+			<!-- 자기 클래스 이름 적기 첫글자는 소문자로 대문자면 못찾음 bean이름 적을 때는 소문자로 -->
+			<beans:ref bean="authenticationInterceptor" />
+		</interceptor>
+	</interceptors>
+
+	<beans:bean
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver"
+		id="multipartResolver">
+		<!-- 업로드 할 수 있는 파일의 최대 크기 10M -->
+		<beans:property value="10485760" name="maxUploadSize" />
+	</beans:bean>
+
+
+	<!-- Spring 프로젝트에서 MVC 관련 어노테이션을 사용할 수 있도록 해주는 설정 -->
+	<annotation-driven />
+
+	<!-- 정적인 파일들을 캐싱 해 줄 수 있는 디렉토리와 url 설정 -->
+	<resources mapping="/resources/**" location="/resources/" />
+
+	<!-- Controller에서 forwarding 할 때 사용하는 뷰 이름을 가지고 조합해서 실제 출력될 파일의 위치와 종류(JSTL 
+		View)를 결정하는 설정 -->
+	<beans:bean
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<beans:property name="prefix" value="/WEB-INF/views/" />
+		<beans:property name="suffix" value=".jsp" />
+	</beans:bean>
+
+	<!-- 어노테이션이 적용된 클래스의 객체를 자동으로 만들어주는 패키지 설정 스프링 MVC 프로젝트에서 모든 클래스는 이 패키지 
+		안에서 생성 domain 클래스를 제외하고는 전부 어노테이션을 이용해서 생성 이 패키지에 있는 클래스들은 new 하지 않고 bean으로 
+		생성하지도 않습니다. 이렇게 사용하는 이유는 사실 디자인 패턴을 공부하고 그 디자인패턴에 맞춰서 만드는건 사실 엄청난 공부가 필요합니다 
+		new를 써서 객체를 생성할 때 바로 만들것인지 싱글톤 을 적용해서 만들것인지 생각하면서 써야한다. 그런데 스프링은 그 것을 내가 
+		해줄테니까 너는 그 기능을 알고 만들고 적용할 줄 만 알면되 이렇게 공부를 많이 하지않아도 많은 사람들이 개발을 할 수 있게 만든 
+		것이 바로 프레임워크! -->
+	<context:component-scan
+		base-package="com.naver.ccy6451" />
+
+	<!-- Controller 가 처리하지 못하는 요청을 WAS가 처리하도록 하는 설정입니다. 필수적으로 합니다. 요즘은 안쓰는 경우가 
+		있는데 그게 카카오 카카오 홈페이지는 완전히 리뉴얼되었다. 카카오는 싱글페이지 기반으로 페이지가 하나이고 데이터를 가져올 때는 ajax를 
+		이용해서 페이지 전환을 안합니다. 그러면 Controller 자체를 안쓰는 경우도 있습니다. -->
+	<default-servlet-handler />
+
+
+
+</beans:beans>

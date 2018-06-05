@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<!-- listener : 프로젝트 실행 및 종료될 때 수행 context-param에 설정된 spring bean configuration 
+		파일의 내용을 읽어서 프로젝트 내의 모든 곳에서 사용할 수 있도록 해주는 내용을 수행 context-param이 없으면 WEB-INF/applicationContext.xml 
+		파일의 내용을 읽어서 수행합니다. -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+	<!-- 모든 곳에서 사용할 bean을 생성하는 s
+	pring bean configuration 파일의 위치 설정 파일이 여러개이면 
+		value에 여러개 나열하면 됩니다. -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/spring/root-context.xml</param-value>
+	</context-param>
+
+
+	<!-- url 패턴에 해당된 url 요청이 왔을 때 
+	처리할 Controller의 위치를 설정 이 파일의 이름을 보통 dispatcher-servlet이라고 
+		하고 FrontController의 역할을 수행합니다. -->
+	<servlet>
+		<servlet-name>appServlet</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/spring/appServlet/servlet-context.xml</param-value>
+		</init-param>
+		<!-- 프로젝트가 실행되면 listener를 수행하고 
+		바로 수행하라는 설정 -->
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>appServlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+<!-- 파라미터 인코딩 필터를 설정
+필터 : Controller가 요청을 처리하기 전이나 후에 동작하는 객체
+한글을 사용할 때는 반드시 설정해야 합니다!
+spring은 미국이 만들었다 굳이 인코딩 설정할 필요가 없겠쥬? -->
+<filter>
+	<filter-name>encoding</filter-name>
+	<filter-class>
+		org.springframework.web.filter.CharacterEncodingFilter
+	</filter-class>
+	<init-param>
+		<param-name>encoding</param-name>
+		<param-value>UTF-8</param-value>
+	</init-param>
+</filter>
+
+<filter-mapping>
+	<filter-name>encoding</filter-name>
+	<url-pattern>/*</url-pattern>
+</filter-mapping>
+<!--404에러가 바생했을 때 보여질 페이지를 설정-->
+<error-page>
+	<error-code>404</error-code>
+	<location>/WEB-INF/views/error/404code.jsp</location>
+</error-page>
+
+</web-app>

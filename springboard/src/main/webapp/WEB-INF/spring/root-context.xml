@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+		<!-- 데이터베이스 연동 시 필수 -->
+<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+	id="dataSource">
+	<property value="oracle.jdbc.driver.OracleDriver" name="driverClassName" />
+	<property value="jdbc:oracle:thin:@192.168.0.200:1521:xe"
+		name="url" />
+	<property value="user09" name="username" />
+	<property value="user09" name="password" />
+</bean>
+<!-- MyBatis 접속정보를 저장하는 클래스의 객체 생성 -->
+		<bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactory">
+	<property name="dataSource" ref="dataSource" />
+	<property value="classpath:/mybatis/mybatis-config.xml" name="configLocation" />
+	<property value="classpath:/mybatis/mappers/*.xml" name="mapperLocations" />
+</bean>
+
+<!-- SQL을 실행할 클래스의 객체 생성 -->
+			<bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSession"
+		destroy-method="clearCache">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+		
+</beans>

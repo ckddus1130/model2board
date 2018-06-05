@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="user">
+
+	<!-- email 중복 검사를 위한 sql parameterType=""select 절과 where절 둘다 확인해서 몇개가지고오는지 
+		하나네~ String resultType select 절만 하나 문자네 Stirng -->
+	<select id="emailcheck" parameterType="java.lang.String"
+		resultType="java.lang.String">
+		select email from springuser where email= #{email}
+
+	</select>
+
+	<!-- 회원가입을 위한 sql -->
+
+	<insert id="register" parameterType="User">
+		insert into springuser(email, pw, nickname, image)
+		values(#{email}, #{pw}, #{nickname}, #{image})
+
+	</insert>
+	
+	<!-- 로그인 처리를 위해서 email을 가지고 모든 정보를 찾아오는 sql -->
+	<select id="login" parameterType="java.lang.String" resultType="User">
+	select email, pw, nickname, image from springuser where email=#{email}
+	</select>
+</mapper>

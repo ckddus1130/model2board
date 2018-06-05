@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="board">
+
+<!-- springreply 테이블에서 게시글 번호에 해당하는
+데이터의 개수를구해주는 sql parameterType은 #붙은거 resultType은 select-->
+<select id="replycnt" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+select count(*)
+from springreply
+where bno=#{bno}
+</select>
+
+	<insert id="register" parameterType="Board">
+		insert into springboard(
+		bno, title, content, ip, email, nickname)
+		values(boardseq.nextval,
+		#{title}, #{content}, #{ip}, #{email},#{nickname})
+	</insert>
+
+<!-- 공통으로 사용할 SQL 작성 ★★★동적SQL-->
+<sql id="search">
+	<if test = "searchType !=null">
+		<if test= "searchType=='t'.toString()">
+			where title like '%'|| #{keyword} || '%'
+		</if>
+		<if test= "searchType=='c'.toString()">
+			where title like '%'|| #{keyword} || '%'
+		</if>
+		<if test= "searchType=='tc'.toString()">
+			where title like '%'|| #{keyword} || '%' or
+			content like '%' || #{keyword} || '%'
+		</if>
+	</if>
+</sql>
+
+	<!-- 전체 데이터 개수를 가져오는 SQL 파라미터는 필요한 데이터가 있을 때 없네여 resultType은 위에만 -->
+	<select id="totalcount" resultType="java.lang.Integer" parameterType="SearchCriteria">
+		select count(*)
+		from springboard
+		<include refid="search"></include>
+	</select>
+
+	<!-- 게시글 전체를 가져오는 SQL -->
+	<select id="list" resultType="Board" parameterType="SearchCriteria">
+		select bno, title, nickname, regdate, readcnt, email
+		from (select rownum rnum, bno,
+		title, nickname, regdate, readcnt, email
+		from(select * from springboard
+		<include refid="search"></include> order by regdate desc))
+		where rnum &gt;=#{pageStart} and
+		rnum &lt;=#{pageStart} + #{perPageNum}-1
+	</select>
+
+
+	<!-- 상세보기를 할 때 글 번호에 해당하는 데이터의 조회수를 1 증가시켜주는 sql -->
+	<update id="updatecnt" parameterType="java.lang.Integer">
+		update springboard
+		set	readcnt = readcnt+1
+		where bno=#{bno}
+	</update>
+
+	<!-- 상세보기를 하기 위해서 글 번호에 해당하는 데이터를 가져오는 sql resultType은 다 받을 수있는거 -->
+	<select id="detail" parameterType="java.lang.Integer"
+		resultType="Board">
+		select *
+		from springboard
+		where bno =#{bno}
+	</select>
+
+	<!-- 게시글 수정을 위한 SQL -->
+	<update id="update" parameterType="Board">
+		update springboard
+		set
+		title=#{title}, content=#{content}, regdate=sysdate, ip=#{ip}
+		where
+		bno=#{bno}
+	</update>
+
+	<!-- 게시글 삭제를 위한 SQL -->
+	<delete id="delete" parameterType="java.lang.Integer">
+		delete from springboard
+		where
+		bno=#{bno}
+	</delete>
+</mapper>
