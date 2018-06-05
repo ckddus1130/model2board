@@ -20,7 +20,7 @@ import com.naver.ccy6451.service.BoardService;
 public class BoardController {
 	@Autowired
 	private BoardService boardService;
-
+	//깃허브에서 작업을 수행한 것이 STS로 가는지 확인
 	// 게시물 작성 페이지로 이동하도록 요청을 처리
 	@RequestMapping(value = "board/register", method = RequestMethod.GET)
 	public String register() {
