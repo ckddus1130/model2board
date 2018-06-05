@@ -20,6 +20,7 @@ import com.naver.ccy6451.service.BoardService;
 public class BoardController {
 	@Autowired
 	private BoardService boardService;
+	//이글은 깃에서 적은것
 	//잘가나요~ :D
 	//깃허브에서 작업을 수행한 것이 STS로 가는지 확인
 	// 게시물 작성 페이지로 이동하도록 요청을 처리
